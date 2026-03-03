@@ -44,6 +44,7 @@ if [ -f "$MY_COMPOSE_TEMPLATE" ]; then
     cp "$MY_COMPOSE_TEMPLATE" "$TARGET_COMPOSE"
 else
     echo "❌ 错误：未找到 $MY_COMPOSE_TEMPLATE，无法部署！"
+    chmod +x ./deploy.sh
     exit 1
 fi
 
@@ -71,6 +72,7 @@ COMPOSE_PROFILES=tools $COMPOSE_BIN build
 
 if [ $? -ne 0 ]; then
     echo "❌ 沙箱构建失败，停止部署。"
+    chmod +x ./deploy.sh
     exit 1
 fi
 
