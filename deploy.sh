@@ -33,7 +33,7 @@ else
 fi
 
 # 5. 完全清除此前部署
-$COMPOSE_BIN down -v --rmi all
+/usr/local/bin/dc_sw.sh down -v --rmi all
 
 # 6. 确保数据目录存在 (由当前用户创建，无需 sudo)
 if [ ! -d "$USER_DATA_DIR" ]; then
@@ -43,11 +43,11 @@ fi
 
 # 7. 重启服务 (关键：使用 ssw 包装器)
 echo "🔄 正在启动容器..."
-$COMPOSE_BIN up -d --build
+/usr/local/bin/dc_sw.sh up -d --build
 
 # 7. 清理镜像 (注意：如果 ssw 未授权此命令则会跳过)
 echo "🧹 尝试清理旧镜像..."
-$DOCKER_BIN image prune -f 2>/dev/null || echo "⚠️  跳过镜像清理 (ssw 策略限制)"
+/usr/local/bin/d_sw.sh image prune -f 2>/dev/null || echo "⚠️  跳过镜像清理 (ssw 策略限制)"
 
 echo "✅ [$(date +'%Y-%m-%d %H:%M:%S')] 部署成功！"
 echo "----------------------------------------------------"
