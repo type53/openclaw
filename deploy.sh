@@ -34,7 +34,7 @@ fi
 echo "🛡️  正在校验数据目录权限..."
 if [ -d "$USER_DATA_DIR" ]; then
     # 使用 sudo 确保权限，因为 ssw 下某些目录可能属于 root 或特定 UID
-    sudo chown -R 1000:1000 "$USER_DATA_DIR"
+    chown -R 1000:1000 "$USER_DATA_DIR"
 else
     echo "⚠️  提示：数据目录 $USER_DATA_DIR 尚不存在，将由 Docker 自动创建。"
 fi
