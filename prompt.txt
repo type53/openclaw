@@ -1,0 +1,102 @@
+现在我的电脑系统是windows11,使用edge浏览器
+我现在用vscode从github上clone了一份最新的openclaw到E:\dev\openclaw下
+npm位置D:\node\node-v24.14.0-win-x64并加入了系统环境变量
+pnpm位置D:\pnpm并加入了系统环境变量
+目前已经成功部署，并且可以用whatsapp进行沟通
+技能安装情况(暂时还不知道怎么用):
+google-search  1.0.0
+playwright-mcp  1.0.0
+claude-code-skill  0.2.0
+github  1.0.0
+我现在希望让agent具有编辑本地文本文档(.txt)的能力
+-----------------------------------------------------------------------
+现在我的电脑系统是windows11,使用edge浏览器
+我现在用vscode从github上clone了一份最新的openclaw到E:\dev\openclaw下
+npm位置D:\node\node-v24.14.0-win-x64并加入了系统环境变量
+pnpm位置D:\pnpm并加入了系统环境变量
+目前已经成功部署，并且可以用whatsapp进行沟通,
+现在我有一个疑问,我想要自己fork一份openclaw到我自己的仓库并保持(https://github.com/openclaw/openclaw.git)一致,
+同时我的vscode或者有能够同步获取,而又不影响我在其中添加的插件技能,一般最典型的做法是怎么样的(只会最基础的git)
+----------------------
+现在对git一知半解吧,
+我现在有两个分支,一个main,用来拉取作者更新,一个cabania作为我自己修改的版本
+我希望cabania版本两个作用:
+    1. 在本地测试或控制本地电脑
+    2. 在云端服务器部署的版本也使用这个cabania分支
+本地是windows11,而远程服务器上是阿里云的alibaba claoud linux 3.21404 lts 64位
+我在使用时应该注意哪些问题,或者告诉我最典型的方案
+-----------------------------
+服务器上我还没部署
+我的服务器现在我自己有一个服务器用户管理脚本,用来控制多租户权限
+另外还用root账户创建了nginx_proxy_manager容器来管理所有租户的出入口
+我上传了服务器相关的配置,请你帮我看看我应该如何部署openclaw,ssw脚本需要修改吗
+--------------------------------
+作者版本中有一个默认的编排文件,为了能顺利部署,我希望能直接在这基础上改
+services:
+  openclaw-gateway:
+    image: ${OPENCLAW_IMAGE:-openclaw:local}
+    environment:
+      HOME: /home/node
+      TERM: xterm-256color
+      OPENCLAW_GATEWAY_TOKEN: ${OPENCLAW_GATEWAY_TOKEN}
+      OPENCLAW_ALLOW_INSECURE_PRIVATE_WS: ${OPENCLAW_ALLOW_INSECURE_PRIVATE_WS:-}
+      CLAUDE_AI_SESSION_KEY: ${CLAUDE_AI_SESSION_KEY:-}
+      CLAUDE_WEB_SESSION_KEY: ${CLAUDE_WEB_SESSION_KEY:-}
+      CLAUDE_WEB_COOKIE: ${CLAUDE_WEB_COOKIE:-}
+    volumes:
+      - ${OPENCLAW_CONFIG_DIR}:/home/node/.openclaw
+      - ${OPENCLAW_WORKSPACE_DIR}:/home/node/.openclaw/workspace
+    ports:
+      - "${OPENCLAW_GATEWAY_PORT:-18789}:18789"
+      - "${OPENCLAW_BRIDGE_PORT:-18790}:18790"
+    init: true
+    restart: unless-stopped
+    command:
+      [
+        "node",
+        "dist/index.js",
+        "gateway",
+        "--bind",
+        "${OPENCLAW_GATEWAY_BIND:-lan}",
+        "--port",
+        "18789",
+      ]
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:18789/healthz').then((r)=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  openclaw-cli:
+    image: ${OPENCLAW_IMAGE:-openclaw:local}
+    network_mode: "service:openclaw-gateway"
+    cap_drop:
+      - NET_RAW
+      - NET_ADMIN
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      HOME: /home/node
+      TERM: xterm-256color
+      OPENCLAW_GATEWAY_TOKEN: ${OPENCLAW_GATEWAY_TOKEN}
+      OPENCLAW_ALLOW_INSECURE_PRIVATE_WS: ${OPENCLAW_ALLOW_INSECURE_PRIVATE_WS:-}
+      BROWSER: echo
+      CLAUDE_AI_SESSION_KEY: ${CLAUDE_AI_SESSION_KEY:-}
+      CLAUDE_WEB_SESSION_KEY: ${CLAUDE_WEB_SESSION_KEY:-}
+      CLAUDE_WEB_COOKIE: ${CLAUDE_WEB_COOKIE:-}
+    volumes:
+      - ${OPENCLAW_CONFIG_DIR}:/home/node/.openclaw
+      - ${OPENCLAW_WORKSPACE_DIR}:/home/node/.openclaw/workspace
+    stdin_open: true
+    tty: true
+    init: true
+    entrypoint: ["node", "dist/index.js"]
+    depends_on:
+      - openclaw-gateway
