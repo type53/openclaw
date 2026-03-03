@@ -42,7 +42,6 @@ if [ ! -d "$USER_DATA_DIR" ]; then
     echo "📂 正在创建数据目录..."
     mkdir -p "$USER_DATA_DIR"
 fi
-chown -R 1000:1000 "$USER_DATA_DIR"
 
 # 7. 重启服务 (关键：使用 ssw 包装器)
 echo "🔄 正在启动容器..."
