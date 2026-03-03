@@ -55,3 +55,6 @@ $DOCKER_BIN image prune -f 2>/dev/null || echo "⚠️  跳过镜像清理 (ssw 
 echo "✅ [$(date +'%Y-%m-%d %H:%M:%S')] 部署成功！"
 echo "----------------------------------------------------"
 EOF
+
+# 赋予权限
+chmod +x deploy.sh
