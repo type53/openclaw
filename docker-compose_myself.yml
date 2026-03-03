@@ -1,6 +1,6 @@
 services:
   openclaw-gateway:
-    image: ${OPENCLAW_IMAGE:-openclaw:local}
+    image: https://bvkwnin5.mirror.aliyuncs.com/type53/openclaw-gateway:latest
     # 【新增1：安全合规】必须携带正确的 owner 标签，且格式必须是字典形式 
     labels:
       owner: clawuser
@@ -48,7 +48,7 @@ services:
       start_period: 20s
 
   openclaw-cli:
-    image: ${OPENCLAW_IMAGE:-openclaw:local}
+    image: https://bvkwnin5.mirror.aliyuncs.com/type53/openclaw-cli:latest
     # 【新增1：安全合规】即便是复用 network_mode，也必须为独立服务打上 owner 标签 
     labels:
       owner: clawuser
