@@ -66,8 +66,8 @@ fi
 # 所以这里必须显式构建。
 echo "🏗️  [1/2] 正在构建沙箱环境 (这可能需要几分钟)..."
 # 注意：如果 ssw 包装器不支持 --profile 参数，请尝试使用:
-# COMPOSE_PROFILES=tools $COMPOSE_BIN build
-$COMPOSE_BIN --profile tools build
+COMPOSE_PROFILES=tools $COMPOSE_BIN build
+# $COMPOSE_BIN --profile tools build
 
 if [ $? -ne 0 ]; then
     echo "❌ 沙箱构建失败，停止部署。"
