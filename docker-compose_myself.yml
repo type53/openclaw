@@ -3,7 +3,11 @@ services:
   # 1. 核心网关 (主脑)
   # ==========================================
   openclaw-gateway:
-    image: ${OPENCLAW_IMAGE:-openclaw:local}
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: openclaw:local
+    container_name: openclaw-gateway
     labels:
       owner: clawuser
     networks:
@@ -50,7 +54,7 @@ services:
   # 2. 命令行接口
   # ==========================================
   openclaw-cli:
-    image: ${OPENCLAW_IMAGE:-openclaw:local}
+    image: openclaw:local
     labels:
       owner: clawuser
     network_mode: "service:openclaw-gateway"
