@@ -6,8 +6,8 @@ cat << 'EOF' > deploy.sh
 # =================================================================
 
 # 1. 定义 ssw 专用包装器路径 (核心：不依赖别名)
-DOCKER_BIN="/usr/local/bin/d_sw.sh"
-COMPOSE_BIN="/usr/local/bin/dc_sw.sh"
+DOCKER_BIN="sudo /usr/local/bin/d_sw.sh"
+COMPOSE_BIN="sudo /usr/local/bin/dc_sw.sh"
 
 USER_DATA_DIR="/data/user/clawuser/openclaw_data"
 MY_COMPOSE_TEMPLATE="docker-compose_myself.yml"
