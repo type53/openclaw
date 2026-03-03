@@ -54,3 +54,6 @@ Error response from daemon: Get "https://registry-1.docker.io/v2/": net/http: re
 🧹 尝试清理旧镜像...
 ⚠️  跳过镜像清理 (ssw 策略限制)
 ✅ [2026-03-03 15:22:36] 部署成功！
+---------------------------------------
+我想在服务器上部署openclaw,不过遇上一些问题,
+看看我这样改可以吗?保留了原版里的一些东西(反正看不懂),还有openclaw-sandbox-browser不需要depends_on吗?为什么总感觉怪怪的,后面两个三个sandbox看起来好像少了很多东西,并且似乎配置的内容还不太一样
