@@ -32,13 +32,16 @@ else
     exit 1
 fi
 
-# 5. 确保数据目录存在 (由当前用户创建，无需 sudo)
+# 5. 完全清除此前部署
+$COMPOSE_BIN down -v --rmi all
+
+# 6. 确保数据目录存在 (由当前用户创建，无需 sudo)
 if [ ! -d "$USER_DATA_DIR" ]; then
     echo "📂 正在创建数据目录..."
     mkdir -p "$USER_DATA_DIR"
 fi
 
-# 6. 重启服务 (关键：使用 ssw 包装器)
+# 7. 重启服务 (关键：使用 ssw 包装器)
 echo "🔄 正在启动容器..."
 $COMPOSE_BIN up -d --build
 
