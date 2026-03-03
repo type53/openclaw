@@ -41,12 +41,13 @@ fi
 
 # 6. 重启服务
 echo "🔄 正在重新构建并启动 Docker 容器..."
-# 这里会直接调用被 ssw 包装过的 docker-compose
-docker-compose up -d --build
+# 【关键修改】使用 sudo 调用 ssw 提供的安全包装器全路径
+sudo /usr/local/bin/dc_sw.sh up -d --build
 
 # 7. 清理无用的镜像
 echo "🧹 正在清理旧的构建镜像..."
-docker image prune -f
+# 【关键修改】使用 sudo 调用 ssw 提供的安全包装器全路径
+sudo /usr/local/bin/d_sw.sh image prune -f
 
 echo "✅ [$(date +'%Y-%m-%d %H:%M:%S')] 部署成功！"
 echo "----------------------------------------------------"
