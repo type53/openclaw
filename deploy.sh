@@ -1,7 +1,8 @@
 cat << 'EOF' > deploy.sh
 #!/bin/bash
 # =================================================================
-# OpenClaw 自动化部署脚本 - ssw 专用版
+# OpenClaw 自动化部署脚本 (基于 ssw 安全环境)
+# 功能：自动拉取代码 + 强行应用私有 Compose 配置 + 重启服务
 # =================================================================
 
 # 1. 定义 ssw 专用包装器路径 (核心：不依赖别名)
@@ -33,21 +34,23 @@ else
 fi
 
 # 5. 完全清除此前部署
-/usr/local/bin/dc_sw.sh down -v --rmi all
+echo "🧹 完全清除此前部署..."
+$COMPOSE_BIN down -v --rmi all
 
 # 6. 确保数据目录存在 (由当前用户创建，无需 sudo)
 if [ ! -d "$USER_DATA_DIR" ]; then
     echo "📂 正在创建数据目录..."
     mkdir -p "$USER_DATA_DIR"
 fi
+chown -R 1000:1000 "$USER_DATA_DIR"
 
 # 7. 重启服务 (关键：使用 ssw 包装器)
 echo "🔄 正在启动容器..."
-/usr/local/bin/dc_sw.sh up -d --build
+$COMPOSE_BIN up -d --build
 
-# 7. 清理镜像 (注意：如果 ssw 未授权此命令则会跳过)
+# 8. 清理镜像 (注意：如果 ssw 未授权此命令则会跳过)
 echo "🧹 尝试清理旧镜像..."
-/usr/local/bin/d_sw.sh image prune -f 2>/dev/null || echo "⚠️  跳过镜像清理 (ssw 策略限制)"
+$DOCKER_BIN image prune -f 2>/dev/null || echo "⚠️  跳过镜像清理 (ssw 策略限制)"
 
 echo "✅ [$(date +'%Y-%m-%d %H:%M:%S')] 部署成功！"
 echo "----------------------------------------------------"
