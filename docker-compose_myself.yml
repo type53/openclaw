@@ -23,10 +23,10 @@ services:
       # 【告知 Gateway 它是运行在 Docker 里的】
       OPENCLAW_DOCKER_MODE: "true" 
     volumes:
-      - ./data/config:/home/node/.openclaw
-      - ./data/workspace:/home/node/.openclaw/workspace
-      # 【赋予 Gateway 控制 Docker 的能力】
-      # 没有这一行，Gateway 无法启动沙箱来运行代码
+      - /data/user/clawuser/openclaw_data/config:/home/node/.openclaw
+      # 将宿主机的 workspace 映射为容器内对应的目录
+      - /data/user/clawuser/openclaw_data/workspace:/home/node/.openclaw/workspace
+      # 赋予控制 Docker 的能力（仅 gateway 需要）
       - /var/run/docker.sock:/var/run/docker.sock
     ports:
       - "${OPENCLAW_GATEWAY_PORT:-18789}:18789"
@@ -73,8 +73,11 @@ services:
       OPENCLAW_GATEWAY_TOKEN: ${OPENCLAW_GATEWAY_TOKEN}
       BROWSER: echo
     volumes:
-      - ./data/config:/home/node/.openclaw
-      - ./data/workspace:/home/node/.openclaw/workspace
+      - /data/user/clawuser/openclaw_data/config:/home/node/.openclaw
+      # 将宿主机的 workspace 映射为容器内对应的目录
+      - /data/user/clawuser/openclaw_data/workspace:/home/node/.openclaw/workspace
+      # 赋予控制 Docker 的能力（仅 gateway 需要）
+      - /var/run/docker.sock:/var/run/docker.sock
     stdin_open: true
     tty: true
     init: true

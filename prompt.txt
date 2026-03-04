@@ -10,11 +10,23 @@ claude-code-skill  0.2.0
 github  1.0.0
 我现在希望让agent具有编辑本地文本文档(.txt)的能力
 -----------------------------------------------------------------------
-这次部署出现了几个沙箱的镜像,openclaw-cli确实保持运行状态的,但openclaw-gateway依然一大堆报错,现在也除在暂停状态了,这应该也不算正常吧,
-容器日志:
-   2026-03-04T12:27:26.882+00:00 Gateway failed to start: Error: non-loopback Control UI requires gateway.controlUi.allowedOrigins (set explicit origins), or set gateway.controlUi.dangerouslyAllowHostHeaderOriginFallback=true to use Host-header origin fallback mode
-   2026-03-04T12:27:30.042+00:00 Gateway failed to start: Error: non-loopback Control UI requires gateway.controlUi.allowedOrigins (set explicit origins), or set gateway.controlUi.dangerouslyAllowHostHeaderOriginFallback=true to use Host-header origin fallback mode
-   2026-03-04T12:27:33.201+00:00 Gateway failed to start: Error: non-loopback Control UI requires gateway.controlUi.allowedOrigins (set explicit origins), or set gateway.controlUi.dangerouslyAllowHostHeaderOriginFallback=true to use Host-header origin fallback mode
-   2026-03-04T12:27:36.740+00:00 Gateway failed to start: Error: non-loopback Control UI requires gateway.controlUi.allowedOrigins (set explicit origins), or set gateway.controlUi.dangerouslyAllowHostHeaderOriginFallback=true to use Host-header origin fallback mode
-   2026-03-04T12:27:40.400+00:00 Gateway failed to start: Error: non-loopback Control UI requires gateway.controlUi.allowedOrigins (set explicit origins), or set gateway.controlUi.dangerouslyAllowHostHeaderOriginFallback=true to use Host-header origin fallback mode
-   2026-03-04T12:27:44.990+00:00 Gateway failed to start: Error: non-loopback Control UI requires gateway.controlUi.allowedOrigins (set explicit origins), or set gateway.controlUi.dangerouslyAllowHostHeaderOriginFallback=true to use Host-header origin fallback mode
+我现在在服务器的.env中这样写的:
+OPENCLAW_CONFIG_DIR=/data/user/clawuser/openclaw_data/config
+OPENCLAW_WORKSPACE_DIR=/data/user/clawuser/openclaw_data/workspace
+OPENCLAW_HOME=/data/user/clawuser/openclaw_data
+OPENCLAW_STATE_DIR=/data/user/clawuser/openclaw_data/.openclaw
+OPENCLAW_CONFIG_PATH=/data/user/clawuser/openclaw_data/.openclaw/openclaw.json
+代码路径: /data/user/clawuser/openclaw
+我想要分离出去的工作目录(.openclaw目录的所在地): /data/user/clawuser/openclaw_data
+然后我发现编排文件中的容器又是这样写的:
+   openclaw-gateway:
+      ...
+      volumes:
+      - ./data/config:/home/node/.openclaw
+      - ./data/workspace:/home/node/.openclaw/workspace
+   openclaw-cli
+      ...
+      volumes:
+      - ./data/config:/home/node/.openclaw
+      - ./data/workspace:/home/node/.openclaw/workspace
+这映射是不是又问题啊,我的ssw脚本也只能允许访问租户在./data/user下对应用户名的目录,请再帮我看看

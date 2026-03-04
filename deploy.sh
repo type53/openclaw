@@ -7,6 +7,7 @@
 # 1. 定义 ssw 专用包装器路径
 DOCKER_BIN="sudo /usr/local/bin/d_sw.sh"
 COMPOSE_BIN="sudo /usr/local/bin/dc_sw.sh"
+CHOWN_BIN="/usr/local/bin/chown_sw.sh"
 
 # 数据目录
 USER_DATA_DIR="/data/user/clawuser/openclaw_data"
@@ -60,10 +61,16 @@ if [ ! -d "$USER_DATA_DIR" ]; then
     mkdir -p "$USER_DATA_DIR"
 fi
 
-# 7. 【关键修改】分步构建与启动
-# ----------------------------------------------------------------
-# 第一步：强制构建所有服务（点名构建，绕过 profile 和 sudo 变量丢失的问题）
-echo "🏗️  [1/2] 正在构建所有环境镜像..."
+echo "📂 正在创建数据子目录..."
+mkdir -p "$USER_DATA_DIR/config"
+mkdir -p "$USER_DATA_DIR/workspace"
+
+echo "🔑 修复数据目录权限..."
+$CHOWN_BIN 1000:1000 "$USER_DATA_DIR/config"
+$CHOWN_BIN 1000:1000 "$USER_DATA_DIR/workspace"
+
+# 7. 【修改】分步构建与启动
+echo "🏗️  [1/2] 正在构建沙箱环境..."
 $COMPOSE_BIN build openclaw-gateway openclaw-sandbox openclaw-sandbox-common openclaw-sandbox-browser
 
 if [ $? -ne 0 ]; then
@@ -77,16 +84,16 @@ echo "🚀 [2/2] 正在启动 OpenClaw 网关与 CLI..."
 $COMPOSE_BIN up -d --remove-orphans openclaw-gateway openclaw-cli
 
 # ==========================================
-# 自动修复 Host 头跨域配置
+# ✨ 自动化修复补丁：自动配置跨域与重启
 # ==========================================
-echo "⏳ 等待 CLI 容器就绪 (3秒)..."
-sleep 3
+echo "⏳ 等待服务初始化 (5秒)..."
+sleep 5
 
-echo "⚙️ 正在自动写入 Gateway 控制台跨域配置..."
-# 直接调用 CLI 容器执行配置写入 (不需要加 -it，因为是脚本后台执行)
-$DOCKER_BIN exec openclaw-cli openclaw config set gateway.controlUi.dangerouslyAllowHostHeaderOriginFallback true
+echo "⚙️  正在自动写入控制台安全配置..."
+# 使用 dc_sw.sh exec 直接操作服务名，避开 d_sw.sh 的解析问题
+$COMPOSE_BIN exec -T openclaw-cli openclaw config set gateway.controlUi.dangerouslyAllowHostHeaderOriginFallback true
 
-echo "🔄 正在重启 Gateway 以应用新配置..."
+echo "🔄 正在重启网关以应用配置..."
 $COMPOSE_BIN restart openclaw-gateway
 # ==========================================
 
@@ -95,9 +102,8 @@ $COMPOSE_BIN restart openclaw-gateway
 echo "🧹 清理无用数据..."
 $DOCKER_BIN image prune -f 2>/dev/null || echo "⚠️  跳过镜像清理"
 
-echo "✅ [$(date +'%Y-%m-%d %H:%M:%S')] 部署成功！"
-echo "   - 网关端口: 18789"
-echo "   - 检查日志: $COMPOSE_BIN logs -f openclaw-gateway"
+echo "✅ [$(date +'%Y-%m-%d %H:%M:%S')] 部署完成！"
+echo "👉 现在你可以运行向导了: sudo /usr/local/bin/dc_sw.sh exec -it openclaw-cli openclaw onboard"
 echo "----------------------------------------------------"
 
 # 赋予自身执行权限
