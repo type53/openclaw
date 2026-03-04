@@ -10,34 +10,28 @@ claude-code-skill  0.2.0
 github  1.0.0
 我现在希望让agent具有编辑本地文本文档(.txt)的能力
 -----------------------------------------------------------------------
-我现在重新编写了编排文件和自动部署脚本, 现在能够全部部署通过, 不过我发现几个问题:
-1. 没有看到沙箱相关的镜像和容器, 用docker images查看, 只能看到openclaw-gateway和openclaw-cli
+我现在重新编写了编排文件和自动部署脚本, 现在能够部署通过, 不过我发现几个问题:
+   1. 能看到openclaw-gateway和openclaw-cli容器
+   2. 看不到沙箱相关的容器和镜像,镜像列表中只能看到一个openclaw:local和一个没有名字没被使用的镜像(可能是清理遗留下来的,大小和openclaw:local一样)
 脚本输出的部署日志:
-🚀 [2026-03-04 11:00:00] 开始自动化部署流程...
+🚀 [2026-03-04 13:07:48] 开始自动化部署流程...
 📥 正在拉取最新的 cabania 分支代码...
-remote: Enumerating objects: 3, done.
-remote: Counting objects: 100% (3/3), done.
-remote: Total 3 (delta 2), reused 3 (delta 2), pack-reused 0 (from 0)
-Unpacking objects: 100% (3/3), 298 bytes | 298.00 KiB/s, done.
 From https://github.com/type53/openclaw
  * branch                cabania    -> FETCH_HEAD
-   2a380a4d5..e0171a94b  cabania    -> origin/cabania
-HEAD is now at e0171a94b 修改cli容器名
+HEAD is now at e942b57de Merge branch 'main' into cabania
 🛠️  应用私有配置 -> docker-compose.yml
 🛑 停止当前服务...
-[+] Running 2/0
- ✔ Container openclaw-openclaw-cli-1  Removed                                                                                                                                      0.0s 
- ✔ Container openclaw-gateway         Removed                                                                                                                                      0.0s 
+Warning: No resource found to remove for project "openclaw".
 🏗️  [1/2] 正在构建沙箱环境 (这可能需要几分钟)...
-[+] Building 143.6s (23/23) FINISHED                                                                                                                                     docker:default
+[+] Building 3984.5s (23/23) FINISHED                                                                                                                                    docker:default
  => [openclaw-gateway internal] load build definition from Dockerfile                                                                                                              0.0s
  => => transferring dockerfile: 6.56kB                                                                                                                                             0.0s
- => [openclaw-gateway internal] load metadata for docker.io/library/node:22-bookworm@sha256:cd7bcd2e7a1e6f72052feb023c7f6b722205d3fcab7bbcbd2d1bfdab10b1e935                      34.3s
+ => [openclaw-gateway internal] load metadata for docker.io/library/node:22-bookworm@sha256:cd7bcd2e7a1e6f72052feb023c7f6b722205d3fcab7bbcbd2d1bfdab10b1e935                       0.0s
  => [openclaw-gateway internal] load .dockerignore                                                                                                                                 0.0s
  => => transferring context: 1.10kB                                                                                                                                                0.0s
- => [openclaw-gateway  1/18] FROM docker.io/library/node:22-bookworm@sha256:cd7bcd2e7a1e6f72052feb023c7f6b722205d3fcab7bbcbd2d1bfdab10b1e935                                       0.0s
  => [openclaw-gateway internal] load build context                                                                                                                                 0.3s
- => => transferring context: 423.19kB                                                                                                                                              0.2s
+ => => transferring context: 423.73kB                                                                                                                                              0.3s
+ => [openclaw-gateway  1/18] FROM docker.io/library/node:22-bookworm@sha256:cd7bcd2e7a1e6f72052feb023c7f6b722205d3fcab7bbcbd2d1bfdab10b1e935                                       0.0s
  => CACHED [openclaw-gateway  2/18] RUN curl -fsSL https://bun.sh/install | bash                                                                                                   0.0s
  => CACHED [openclaw-gateway  3/18] RUN corepack enable                                                                                                                            0.0s
  => CACHED [openclaw-gateway  4/18] WORKDIR /app                                                                                                                                   0.0s
@@ -47,17 +41,17 @@ HEAD is now at e0171a94b 修改cli容器名
  => CACHED [openclaw-gateway  8/18] COPY --chown=node:node ui/package.json ./ui/package.json                                                                                       0.0s
  => CACHED [openclaw-gateway  9/18] COPY --chown=node:node patches ./patches                                                                                                       0.0s
  => CACHED [openclaw-gateway 10/18] COPY --chown=node:node scripts ./scripts                                                                                                       0.0s
- => CACHED [openclaw-gateway 11/18] RUN NODE_OPTIONS=--max-old-space-size=2048 pnpm install --frozen-lockfile                                                                      0.0s
- => CACHED [openclaw-gateway 12/18] RUN if [ -n "" ]; then       apt-get update &&       DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends xvfb &&         0.0s
- => CACHED [openclaw-gateway 13/18] RUN if [ -n "" ]; then       apt-get update &&       DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends         ca-cer  0.0s
- => [openclaw-gateway 14/18] COPY --chown=node:node . .                                                                                                                            0.8s
- => [openclaw-gateway 15/18] RUN for dir in /app/extensions /app/.agent /app/.agents; do       if [ -d "$dir" ]; then         find "$dir" -type d -exec chmod 755 {} +;         f  1.9s
- => [openclaw-gateway 16/18] RUN pnpm build                                                                                                                                       96.8s
- => [openclaw-gateway 17/18] RUN pnpm ui:build                                                                                                                                     4.0s 
+ => [openclaw-gateway 11/18] RUN NODE_OPTIONS=--max-old-space-size=2048 pnpm install --frozen-lockfile                                                                          3821.9s
+ => [openclaw-gateway 12/18] RUN if [ -n "" ]; then       apt-get update &&       DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends xvfb &&       mkdir -  0.2s 
+ => [openclaw-gateway 13/18] RUN if [ -n "" ]; then       apt-get update &&       DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends         ca-certificat  0.2s 
+ => [openclaw-gateway 14/18] COPY --chown=node:node . .                                                                                                                            5.2s 
+ => [openclaw-gateway 15/18] RUN for dir in /app/extensions /app/.agent /app/.agents; do       if [ -d "$dir" ]; then         find "$dir" -type d -exec chmod 755 {} +;         f  1.9s 
+ => [openclaw-gateway 16/18] RUN pnpm build                                                                                                                                      108.9s 
+ => [openclaw-gateway 17/18] RUN pnpm ui:build                                                                                                                                     3.8s 
  => [openclaw-gateway 18/18] RUN ln -sf /app/openclaw.mjs /usr/local/bin/openclaw  && chmod 755 /app/openclaw.mjs                                                                  0.2s 
- => [openclaw-gateway] exporting to image                                                                                                                                          5.3s 
- => => exporting layers                                                                                                                                                            5.3s 
- => => writing image sha256:87ef2ea359645cde00b345a5ad675f0b0a3f4f84abed720024b893406e89e462                                                                                       0.0s 
+ => [openclaw-gateway] exporting to image                                                                                                                                         41.8s 
+ => => exporting layers                                                                                                                                                           41.8s 
+ => => writing image sha256:0d309f0628dd905c3f2df661656d6db7d0a0de5c618fbf554b2afd8777b412b9                                                                                       0.0s 
  => => naming to docker.io/library/openclaw:local                                                                                                                                  0.0s 
 🚀 [2/2] 正在启动 OpenClaw 网关...                                                                                                                                                      
 🔎 [1/3] 正在解析 compose 文件...
@@ -68,6 +62,6 @@ HEAD is now at e0171a94b 修改cli容器名
  ✔ Container openclaw-cli      Started                                                                                                                                             0.4s 
 🧹 清理无用数据...
 ⚠️  跳过镜像清理
-✅ [2026-03-04 11:02:26] 部署成功！
+✅ [2026-03-04 14:14:15] 部署成功！
    - 网关端口: 18789
    - 检查日志: sudo /usr/local/bin/dc_sw.sh logs -f openclaw-gateway

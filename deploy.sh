@@ -62,13 +62,9 @@ fi
 
 # 7. 【关键修改】分步构建与启动
 # ----------------------------------------------------------------
-# 第一步：构建沙箱镜像
-# 因为我们在 compose 里加了 profiles: ["tools"]，普通的 up 命令不会构建它们
-# 所以这里必须显式构建。
-echo "🏗️  [1/2] 正在构建沙箱环境 (这可能需要几分钟)..."
-# 注意：如果 ssw 包装器不支持 --profile 参数，请尝试使用:
-COMPOSE_PROFILES=tools $COMPOSE_BIN build
-# $COMPOSE_BIN --profile tools build
+# 第一步：强制构建所有服务（点名构建，绕过 profile 和 sudo 变量丢失的问题）
+echo "🏗️  [1/2] 正在构建所有环境镜像 (因为网关已有缓存，这次主要构建沙箱)..."
+$COMPOSE_BIN build openclaw-gateway openclaw-sandbox openclaw-sandbox-common openclaw-sandbox-browser
 
 if [ $? -ne 0 ]; then
     echo "❌ 沙箱构建失败，停止部署。"
@@ -79,7 +75,7 @@ fi
 # 第二步：启动核心服务 (Gateway + CLI)
 # 这里不需要 --profile tools，因为我们只想运行网关，不想运行构建器容器
 echo "🚀 [2/2] 正在启动 OpenClaw 网关..."
-$COMPOSE_BIN up -d --remove-orphans
+$COMPOSE_BIN up -d --remove-orphans openclaw-gateway openclaw-cli
 
 # 8. 清理悬空镜像 (Dangling images)
 # 只清理构建过程中产生的无用中间层，不删现有镜像
