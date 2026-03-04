@@ -63,7 +63,7 @@ fi
 # 7. 【关键修改】分步构建与启动
 # ----------------------------------------------------------------
 # 第一步：强制构建所有服务（点名构建，绕过 profile 和 sudo 变量丢失的问题）
-echo "🏗️  [1/2] 正在构建所有环境镜像 (因为网关已有缓存，这次主要构建沙箱)..."
+echo "🏗️  [1/2] 正在构建所有环境镜像..."
 $COMPOSE_BIN build openclaw-gateway openclaw-sandbox openclaw-sandbox-common openclaw-sandbox-browser
 
 if [ $? -ne 0 ]; then
