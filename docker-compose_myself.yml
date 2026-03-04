@@ -55,6 +55,7 @@ services:
   # ==========================================
   openclaw-cli:
     image: openclaw:local
+    container_name: openclaw-cli
     labels:
       owner: clawuser
     network_mode: "service:openclaw-gateway"
