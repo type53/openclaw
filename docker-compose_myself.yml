@@ -20,12 +20,12 @@ services:
       CLAUDE_AI_SESSION_KEY: ${CLAUDE_AI_SESSION_KEY:-}
       CLAUDE_WEB_SESSION_KEY: ${CLAUDE_WEB_SESSION_KEY:-}
       CLAUDE_WEB_COOKIE: ${CLAUDE_WEB_COOKIE:-}
-      # 【新增：告知 Gateway 它是运行在 Docker 里的】
+      # 【告知 Gateway 它是运行在 Docker 里的】
       OPENCLAW_DOCKER_MODE: "true" 
     volumes:
       - ./data/config:/home/node/.openclaw
       - ./data/workspace:/home/node/.openclaw/workspace
-      # 【关键修改：赋予 Gateway 控制 Docker 的能力】
+      # 【赋予 Gateway 控制 Docker 的能力】
       # 没有这一行，Gateway 无法启动沙箱来运行代码
       - /var/run/docker.sock:/var/run/docker.sock
     ports:
