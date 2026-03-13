@@ -80,6 +80,7 @@ $COMPOSE_BIN up -d --remove-orphans openclaw-gateway openclaw-cli
 # 8. 清理悬空镜像 (Dangling images)
 # 只清理构建过程中产生的无用中间层，不删现有镜像
 echo "🧹 清理无用数据..."
+$DOCKER_BIN container prune -f 2>/dev/null
 $DOCKER_BIN image prune -f 2>/dev/null || echo "⚠️  跳过镜像清理"
 
 echo "✅ [$(date +'%Y-%m-%d %H:%M:%S')] 部署成功！"
