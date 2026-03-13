@@ -123,3 +123,6 @@ dist/protocol.schema.json
 # Synthing
 **/.stfolder/
 .dev-state
+
+# Local Management
+git_manager.ps1

@@ -1,0 +1,138 @@
+services:
+  # ==========================================
+  # 1. 核心网关 (主脑)
+  # ==========================================
+  openclaw-gateway:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: openclaw:local
+    container_name: openclaw-gateway
+    labels:
+      owner: clawuser
+    networks:
+      - claw_2_npm
+    environment:
+      HOME: /home/node
+      TERM: xterm-256color
+      OPENCLAW_GATEWAY_TOKEN: ${OPENCLAW_GATEWAY_TOKEN}
+      OPENCLAW_ALLOW_INSECURE_PRIVATE_WS: ${OPENCLAW_ALLOW_INSECURE_PRIVATE_WS:-}
+      CLAUDE_AI_SESSION_KEY: ${CLAUDE_AI_SESSION_KEY:-}
+      CLAUDE_WEB_SESSION_KEY: ${CLAUDE_WEB_SESSION_KEY:-}
+      CLAUDE_WEB_COOKIE: ${CLAUDE_WEB_COOKIE:-}
+      # 【告知 Gateway 它是运行在 Docker 里的】
+      OPENCLAW_DOCKER_MODE: "true" 
+    volumes:
+      - ./data/user/clawuser/openclaw_data/config:/home/node/.openclaw
+      - ./data/user/clawuser/openclaw_data/workspace:/home/node/.openclaw/workspace
+      # 【赋予 Gateway 控制 Docker 的能力】
+      # 没有这一行，Gateway 无法启动沙箱来运行代码
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - "${OPENCLAW_GATEWAY_PORT:-18789}:18789"
+      - "${OPENCLAW_BRIDGE_PORT:-18790}:18790"
+    init: true
+    restart: unless-stopped
+    command:
+      [
+        "node",
+        "dist/index.js",
+        "gateway",
+        "--bind",
+        "${OPENCLAW_GATEWAY_BIND:-lan}",
+        "--port",
+        "18789",
+        "--allow-unconfigured"
+      ]
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:18789/healthz').then((r)=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  # ==========================================
+  # 2. 命令行接口
+  # ==========================================
+  openclaw-cli:
+    image: openclaw:local
+    container_name: openclaw-cli
+    labels:
+      owner: clawuser
+    network_mode: "service:openclaw-gateway"
+    depends_on:
+      - openclaw-gateway
+    cap_drop:
+      - NET_RAW
+      - NET_ADMIN
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      HOME: /home/node
+      TERM: xterm-256color
+      OPENCLAW_GATEWAY_TOKEN: ${OPENCLAW_GATEWAY_TOKEN}
+      BROWSER: echo
+    volumes:
+      - ./data/user/clawuser/openclaw_data/config:/home/node/.openclaw
+      - ./data/user/clawuser/openclaw_data/workspace:/home/node/.openclaw/workspace
+    stdin_open: true
+    tty: true
+    init: true
+    command: ["tail", "-f", "/dev/null"]
+
+  # ==========================================
+  # 3. 基础沙箱 (镜像构建器)
+  # ==========================================
+  # 注意：这些服务的主要目的是为了构建 Image。
+  # Gateway 会调用这些 Image 来生成临时的 Worker 容器。
+  openclaw-sandbox:
+    build:
+      context: .
+      dockerfile: Dockerfile.sandbox
+    # 必须指定 image 名字，这样 Gateway 才能找到它
+    image: openclaw-sandbox:bookworm-slim 
+    container_name: openclaw-sandbox-builder
+    labels:
+      owner: clawuser
+    # 使用 profiles 避免它作为服务一直运行，它只需要构建
+    # 如果你的 docker 版本较老不支持 profiles，可以删掉这行，保留原来的 command: sleep infinity
+    profiles: ["tools"] 
+    command: ["echo", "I am just a builder"]
+
+  # ==========================================
+  # 4. 增强版沙箱 (镜像构建器)
+  # ==========================================
+  openclaw-sandbox-common:
+    build:
+      context: .
+      dockerfile: Dockerfile.sandbox-common
+    image: openclaw-sandbox-common:local
+    container_name: openclaw-sandbox-common-builder
+    labels:
+      owner: clawuser
+    depends_on:
+      - openclaw-sandbox # 必须等待基础镜像构建完
+    profiles: ["tools"]
+    command: ["echo", "I am just a builder"]
+
+  # ==========================================
+  # 5. 浏览器可视化沙箱 (镜像构建器)
+  # ==========================================
+  openclaw-sandbox-browser:
+    build:
+      context: .
+      dockerfile: Dockerfile.sandbox-browser
+    image: openclaw-sandbox-browser:local
+    container_name: openclaw-sandbox-browser-builder
+    labels:
+      owner: clawuser
+    depends_on:
+      - openclaw-sandbox # 依赖基础镜像
+    profiles: ["tools"]
+    # 注意：这里不需要暴露端口，因为真正的端口是在 Gateway 动态启动容器时映射的
+    command: ["echo", "I am just a builder"]
+
+networks:
+  claw_2_npm:
+    external: true
+    name: claw_2_npm
