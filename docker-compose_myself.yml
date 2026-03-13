@@ -85,7 +85,6 @@ services:
     tty: true
     init: true
     entrypoint: ["node", "dist/index.js"]
-    command: ["tail", "-f", "/dev/null"]
 
   # ==========================================
   # 3. 基础沙箱 (镜像构建器)
