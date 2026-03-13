@@ -29,9 +29,9 @@ cd "$(dirname "$0")"
 # fi
 
 # 3. 从 GitHub 同步最新代码
-echo "📥 正在拉取最新的 cabania 分支代码..."
-git fetch origin cabania
-git reset --hard origin/cabania
+# echo "📥 正在拉取最新的 my_dev 分支代码..."
+# git fetch origin my_dev
+# git reset --hard origin/my_dev
 
 # 【恢复配置】从备份恢复（如果本地文件被 git 覆盖了）
 # if [ -f "/tmp/openclaw_config_backup.yml" ]; then
