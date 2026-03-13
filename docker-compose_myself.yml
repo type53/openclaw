@@ -23,6 +23,7 @@ services:
       # 【告知 Gateway 它是运行在 Docker 里的】
       OPENCLAW_DOCKER_MODE: "true"
       DOCKER_HOST: "tcp://openclaw-dind:2375"
+      OPENCLAW_CONTROL_UI_ALLOWED_ORIGINS: "https://aiterature.com,https://www.aiterature.com"
     volumes:
       - ${OPENCLAW_CONFIG_DIR}:/home/node/.openclaw
       - ${OPENCLAW_WORKSPACE_DIR}:/home/node/.openclaw/workspace
