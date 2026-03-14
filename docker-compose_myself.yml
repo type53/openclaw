@@ -23,6 +23,15 @@ services:
       # 【告知 Gateway 它是运行在 Docker 里的】
       OPENCLAW_DOCKER_MODE: "true"
       DOCKER_HOST: "tcp://openclaw-dind:2375"
+
+      # --- CORS / Control UI Settings ---
+      # Attempt 1: Direct camelCase mapping (Common in some custom configs)
+      OPENCLAW_GATEWAY_CONTROLUI_ALLOWEDORIGINS: "http://openclaw.aiterature.com,https://openclaw.aiterature.com"
+      OPENCLAW_GATEWAY_CONTROLUI_DANGEROUSLYALLOWHOSTHEADERORIGINFALLBACK: "true"
+
+      # Attempt 2: Double underscore nesting (Very common in Node.js config modules)
+      OPENCLAW_GATEWAY__CONTROLUI__ALLOWEDORIGINS: "http://openclaw.aiterature.com,https://openclaw.aiterature.com"
+      OPENCLAW_GATEWAY__CONTROLUI__DANGEROUSLYALLOWHOSTHEADERORIGINFALLBACK: "true"
     volumes:
       - ${OPENCLAW_CONFIG_DIR}:/home/node/.openclaw
       - ${OPENCLAW_WORKSPACE_DIR}:/home/node/.openclaw/workspace
@@ -42,7 +51,8 @@ services:
       - "${OPENCLAW_BRIDGE_PORT:-18790}:18790"
     init: true
     restart: unless-stopped
-    command: [
+    command:
+      [
         "node",
         "dist/index.js",
         "gateway",
@@ -51,8 +61,6 @@ services:
         "--port",
         "18789",
         "--allow-unconfigured",
-        # "--gateway.controlUi.dangerouslyDisableDeviceAuth",
-        "--gateway.controlUi.allowedOrigins=['http://localhost:18789','http://openclaw.aiterature.com','https://openclaw.aiterature.com']",
       ]
     healthcheck:
       test:
