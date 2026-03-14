@@ -169,3 +169,13 @@ networks:
   claw_2_npm:
     external: true
     name: claw_2_npm
+
+volumes:
+  openclaw_config:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /data/user/clawuser/openclaw_data
+    labels:
+      owner: clawuser
