@@ -52,7 +52,7 @@ services:
         "--port",
         "18789",
         "--allow-unconfigured",
-        "--gateway.controlUi.dangerouslyDisableDeviceAuth=true",
+        "--gateway.controlUi.dangerouslyDisableDeviceAuth",
         "--gateway.controlUi.allowedOrigins=['http://localhost:18789','http://openclaw.aiterature.com','https://openclaw.aiterature.com']",
       ]
     healthcheck:
