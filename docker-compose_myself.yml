@@ -61,6 +61,8 @@ services:
         "--port",
         "18789",
         "--allow-unconfigured",
+        "--gateway.controlUi.dangerouslyAllowHostHeaderOriginFallback=true",
+        "--gateway.controlUi.ALLOWEDORIGINS=['http://localhost:18789','http://openclaw.aiterature.com','https://openclaw.aiterature.com']",
       ]
     healthcheck:
       test:
