@@ -24,14 +24,8 @@ services:
       OPENCLAW_DOCKER_MODE: "true"
       DOCKER_HOST: "tcp://openclaw-dind:2375"
 
-      # --- CORS / Control UI Settings ---
-      # Attempt 1: Direct camelCase mapping (Common in some custom configs)
-      OPENCLAW_GATEWAY_CONTROLUI_ALLOWEDORIGINS: "http://aiterature.com,https://aiterature.com,http://www.aiterature.com,https://www.aiterature.com"
-      OPENCLAW_GATEWAY_CONTROLUI_DANGEROUSLYALLOWHOSTHEADERORIGINFALLBACK: "true"
-
-      # Attempt 2: Double underscore nesting (Very common in Node.js config modules)
-      OPENCLAW_GATEWAY__CONTROLUI__ALLOWEDORIGINS: "http://aiterature.com,https://aiterature.com,http://www.aiterature.com,https://www.aiterature.com"
-      OPENCLAW_GATEWAY__CONTROLUI__DANGEROUSLYALLOWHOSTHEADERORIGINFALLBACK: "true"
+      ALLOWEDORIGINS: "http://aiterature.com,https://aiterature.com,http://www.aiterature.com,https://www.aiterature.com"
+      DANGEROUSLYALLOWHOSTHEADERORIGINFALLBACK: "true"
     volumes:
       - ${OPENCLAW_CONFIG_DIR}:/home/node/.openclaw
       - ${OPENCLAW_WORKSPACE_DIR}:/home/node/.openclaw/workspace
