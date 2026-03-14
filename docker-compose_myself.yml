@@ -67,24 +67,6 @@ services:
       start_period: 20s
 
   # ==========================================
-  # X. Isolated Docker Daemon (DinD)
-  # ==========================================
-  openclaw-dind:
-    image: docker:24-dind
-    container_name: openclaw-dind
-    privileged: true
-    labels:
-      owner: clawuser
-    environment:
-      # Disabling TLS for internal network communication simplicity
-      - DOCKER_TLS_CERTDIR=""
-    networks:
-      - claw_2_npm
-    volumes:
-      # Store images and container data internally
-      - ${OPENCLAW_DIND_DIR}:/var/lib/docker
-
-  # ==========================================
   # 2. 命令行接口
   # ==========================================
   openclaw-cli:
@@ -112,6 +94,24 @@ services:
     tty: true
     init: true
     entrypoint: ["node", "dist/index.js"]
+
+  # ==========================================
+  # X. Isolated Docker Daemon (DinD)
+  # ==========================================
+  openclaw-dind:
+    image: docker:24-dind
+    container_name: openclaw-dind
+    privileged: true
+    labels:
+      owner: clawuser
+    environment:
+      # Disabling TLS for internal network communication simplicity
+      - DOCKER_TLS_CERTDIR=""
+    networks:
+      - claw_2_npm
+    volumes:
+      # Store images and container data internally
+      - ${OPENCLAW_DIND_DIR}:/var/lib/docker
 
   # ==========================================
   # 3. 基础沙箱 (镜像构建器)
